@@ -7,6 +7,30 @@
 #include <stdbool.h>
 #include <iostream>
 using namespace std;
+
+
+//This's a basic gaussRand found in internet.
+double gaussrand(){
+	static double V1, V2, S;
+	static int phase = 0;
+	double X;
+	if (phase == 0 ) {
+		do {
+			double U1 = (double)rand() / RAND_MAX;
+			double U2 = (double)rand() / RAND_MAX;
+			V1 = 2.0 * U1 - 1.0;
+			V2 = 2.0 * U2 - 1.0;
+			S = V1 * V1 + V2 * V2;
+		} while(S >= 1 || S == 0);
+		X = V1 * sqrt(-2 * log(S) / S);
+	} else
+		X = V2 * sqrt(-2 * log(S) / S);
+	phase = 1 - phase;
+	return X;
+}
+inline double NormD(double u,double t){
+	return gaussrand()*t+u;
+}
 double f(double x,double y){
 	// if f<=0, means (x,y) locates inside? really? Notice::this conclusion may not be correct.
 	double x2=x*x;
@@ -15,7 +39,7 @@ double f(double x,double y){
 	return t*t-x2*y2;
 }
 bool isInsideHeart(double x, double y){
-	//the heart's size x:[-1.5,1.5] y:[0,1.5]
+	//heart's size x:[-1.2,1.2] y:[-1,1.2]
 	//1. y>=0, part1+part2
 		//part1. f<0
 		//or part2.  |x|<1 && |y|<1
@@ -38,7 +62,29 @@ bool isInsideHeart(double x, double y){
 	}
 		
 }
+bool isInsideNormalHeart(double x, double y){
+	//input x:[-1,1],y:[-1,1]
+	return isInsideHeart(x*1.2,y*1.2);
+}
+/** 请完成下面这个函数，实现题目要求的功能 **/
+/** 当然，你也可以不按照这个模板来作答，完全按照自己的想法来 ^-^  **/
+double leartCurve(double u1, double t1, double u2, double t2) {
+	//x~N(u1,t1)   y~N(u2,t2)
+	//(x^2+y^2-1)^2=x^2*y^2
+	double x,y;
+	int maxCount=100000;
+	int count=0;
+	for(int i=0;i<maxCount;i++){
+		x=NormD(u1,t1);
+		y=NormD(u2,t2);
+		if(isInsideHeart(x,y)){
+			count++;
+		}
+	}
+	return (double)count/maxCount;
+}
 int testHeart() {
+	//for python to plot data.
 	double x,y;
 	double step=0.01;
 	double lim=2;
@@ -55,15 +101,14 @@ int testHeart() {
 }
 void printHeart(){
 	int numR=30;
-	int numC=numR*2;
+	int numC=numR;
 	for(int r=0;r<numR;r++){
 		for(int c=0;c<numC;c++){
 			double x=c-numC/2;
 			double y=numR/2-r;
-			double r=2.4;
-			x=x/(double)numC*r;
-			y=y/(double)numR*r;
-			if(isInsideHeart(x,y)){
+			x=x/(double)(numR/2);
+			y=y/(double)(numR/2);
+			if(isInsideNormalHeart(x,y)){
 				cout<<"#";
 			}else{
 				cout<<" ";
@@ -75,6 +120,7 @@ void printHeart(){
 }
 int main(){
 	printHeart();
+	//testHeart();
 	return 0;
 }
 
