@@ -54,7 +54,7 @@ int testHeart() {
 
 }
 void printHeart(){
-	int numR=35;
+	int numR=30;
 	int numC=numR*2;
 	for(int r=0;r<numR;r++){
 		for(int c=0;c<numC;c++){
